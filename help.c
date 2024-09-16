@@ -12,14 +12,15 @@ void PrintHelp()
     printf("  vpn_mgr connect <url>                    connect to VPN by url (no use of config files, everything on command-line)\n");
     printf("\n");
     printf("Options:\n");
+    printf("  -c <path>             path to vendor-supplied vpn (wireguard or openvpn) config file\n");
+    printf("  -conf <path>          path to vendor-supplied vpn (wireguard or openvpn) config file\n");
     printf("  -d <dev>              name of LOCAL network device (e.g. tun0) to use\n");
     printf("  -dev <dev>            name of LOCAL network device (e.g. tun0) to use\n");
     printf("  -ldev <dev>           name of LOCAL network device (e.g. tun0) to use\n");
+    printf("  -local-dev <dev>      name of LOCAL network device (e.g. tun0) to use\n");
     printf("  -D <dev>              name of REMOTE network device (e.g. tun0) to use\n");
     printf("  -rdev <dev>           name of REMOTE network device (e.g. tun0) to use\n");
     printf("  -remote-dev <dev>     name of REMOTE network device (e.g. tun0) to use\n");
-    printf("  -c <path>             path to vendor-supplied vpn (wireguard or openvpn) config file\n");
-    printf("  -conf <path>          path to vendor-supplied vpn (wireguard or openvpn) config file\n");
     printf("  -a <ip list>          list of IPs accessible at the remote end of the vpn connection\n");
     printf("  -A <ip list>          list of remote IPs to be routed DOWN the vpn connection\n");
     printf("  -L <ip address>       ip address of LOCAL end of tunnel\n");
@@ -28,6 +29,7 @@ void PrintHelp()
     printf("  -R <ip address>       ip address of REMOTE end of tunnel\n");
     printf("  -raddr <ip address>   ip address of REMOTE end of tunnel\n");
     printf("  -remote-address <ip address>   ip address of REMOTE end of tunnel\n");
+    printf("  -tcp                  use tcp, not udp for connection (this only applies to openvpn which can use either\n");
     printf("  -cert <path>          path to file holding the client certificate for a vpn connection\n");
     printf("  -key <path>           path to file holding the client private key for a vpn connection (if not supplied, assumed to be stored in -cert file along with certificate)\n");
     printf("  -k <path>             path to file holding the client private key for a vpn connection\n");

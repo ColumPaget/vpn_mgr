@@ -31,14 +31,15 @@ OPTIONS
 =======
 
 ```
+  -c <path>             path to vendor-supplied vpn (wireguard or openvpn) config file
+  -conf <path>          path to vendor-supplied vpn (wireguard or openvpn) config file
   -d <dev>              name of LOCAL network device (e.g. tun0) to use
   -dev <dev>            name of LOCAL network device (e.g. tun0) to use
   -ldev <dev>           name of LOCAL network device (e.g. tun0) to use
+  -local-dev <dev>      name of LOCAL network device (e.g. tun0) to use
   -D <dev>              name of REMOTE network device (e.g. tun0) to use
   -rdev <dev>           name of REMOTE network device (e.g. tun0) to use
   -remote-dev <dev>     name of REMOTE network device (e.g. tun0) to use
-  -c <path>             path to a vendor-supplied vpn config file
-  -conf <path>          path to a vendor-supplied vpn config file
   -a <ip list>          list of IPs accessible at the remote end of the vpn connection
   -A <ip list>          list of remote IPs to be routed DOWN the vpn connection
   -L <ip address>       ip address of LOCAL end of tunnel
@@ -47,12 +48,16 @@ OPTIONS
   -R <ip address>       ip address of REMOTE end of tunnel
   -raddr <ip address>   ip address of REMOTE end of tunnel
   -remote-address <ip address>   ip address of REMOTE end of tunnel
+  -tcp                  use tcp, not udp for connection (this only applies to openvpn which can use either
   -cert <path>          path to file holding the client certificate for a vpn connection
   -key <path>           path to file holding the client private key for a vpn connection (if not supplied, assumed to be stored in -cert file along with certificate)
   -k <path>             path to file holding the client private key for a vpn connection
   -server-key <path>    path to file holding the CA certificates for server verification (or server public key for wireguard)
   -psk <path>           path to file holding the pre-shared-key for vpns using this instead of certificates
   -ca <path>            path to file holding the CA certificates for server verification (or server public key for wireguard)
+  -ciphers <list>       comma-seperated list of ciphers to use
+  -up <file list>       colon-seperated list of scripts to run when vpn comes up (default /etc/vpn_mgr/<name>.up:/etc/vpn_mgr/default.up)
+  -down <file list>     colon-seperated list of scripts to run when vpn goes down (default /etc/vpn_mgr/<name>.down:/etc/vpn_mgr/default.down)
   -V                    verify peer at the ppp level on ppp based vpns. Requires the server to identify itself with a username/pasword
   -verify               verify peer at the ppp level on ppp based vpns. Requires the server to identify itself with a username/pasword
   -user <username>      username for vpns that support username/password authentication
@@ -63,10 +68,10 @@ OPTIONS
   -local-sudo           force use of sudo locally, rather than trying both sudo and su
   -local-su             force use of su locally, rather than trying both sudo and su
   -remote-sudo          force use of sudo at remote end, rather than trying both sudo and su
-  -remote-su            force use of su at remote end, rather than trying both sudo and su
+  -remote-su            force use of su at remote end, rather than trying both sudo an[?9l[?1000ld su
   -N                    use neither su or sudo at the remote end, assume remote is setup to run with root permission
   -dns <ip list>        comma-separated list of dns servers to use with this vpn
-  -dns peer             use dns server list supplied by server over ppp based vpns
+  -dns peer             use dns server list supplied by ppp based vpns
   -nodns                do not use dns servers saved in vpn config
   -ppp-auth             use ppp-chap authentication
   -id <string>          set a 'client id' string. Currently only used to set the ipparam of ppp-based networks in order to identify who/what is connecting and allow setting per-connection rules on the server.
@@ -101,18 +106,22 @@ VPN URL TYPES
 
 The following url types are supported:
 
-ssh:      -  native ssh 'tunnel' vpn
-pppssh:   -  ppp over ssh vpn
-wg:       -  wireguard vpn
-ovpn:     -  openvpn vpn
-ppptls:   -  ppp over tls/ssl vpn
-pppssl:   -  ppp over tls/ssl vpn
+  * ssh:      -  native ssh 'tunnel' vpn
+  * pppssh:   -  ppp over ssh vpn
+  * wg:       -  wireguard vpn
+  * ovpn:     -  openvpn vpn
+  * ppptls:   -  ppp over tls/ssl vpn
+  * pppssl:   -  ppp over tls/ssl vpn
 
 
 SSH VPNS
 ========
 
-VPNs using openssh's native 'tunnel' system are supported. All that's needed at the server end is a 'tun' device to use. Unfortuantely this usually has to be setup and agreed in advance. If we are logging into an ssh server as root, then we can specify 'any' as the remote '-rdev any'
+VPNs using openssh's native 'tunnel' system are supported. All that's needed at the server end is a 'tun' device to use. Unfortuantely this usually has to be setup and agreed in advance. 
+
+As we will not usually be logging into the ssh server as root, so sshd cannot setup a fresh tun device. Thus one has to be set up in advance. e.g. with `ip tuntap add tun3 mode tun` and then, when we connect with vpn_mgr, we would have to give the argument `-rdev 3`.
+
+If we are logging into an ssh server as root, then we can specify 'any' as the remote `-rdev any` and sshd should set up or find a tun device it can use.
 
 
 
@@ -132,6 +141,8 @@ Wireguard is essentially a symmetric protocol, without a 'client' and 'server' a
 
 OPENVPN VPNS
 ============
+
+Openvpn is one of the most confusing vpn solutions, due to it's wide range of options and configurations, vpn_mgr can use a vendor-supplied config file with the '-c' or '-conf' options. vpn_mgr only supports openvpn's tls based encryption, not it's other encryption options. It can support either UDP connections (the default) or TCP connections using the '-tcp' option.
 
 
 PPP based VPNS
