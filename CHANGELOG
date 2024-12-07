@@ -1,4 +1,5 @@
 v2.0 (2024-12-06)
+-----------------
   * Handle SIGTTOU so program doesn't get frozen when run in background
   * Make supplying a CA file mandatory in server mode.
   * Add support for syslog logging, particularly for server mode.
@@ -7,6 +8,7 @@ v2.0 (2024-12-06)
   * Add CHANGELOG
 
 v1.1 (2024-09-16)
+-----------------
   * Minor documentation changes 
 
 
