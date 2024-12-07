@@ -14,11 +14,15 @@
 #define ACT_CONNECT 8192
 #define ACT_SERVER  16394
 #define ACT_PROTOCOLS 32788
+#define ACT_VERSION   65576
+#define ACT_HELP     131152
 
 typedef struct
 {
-    int Action;
-    int Flags;
+    unsigned int Action;
+    unsigned int Flags;
+    unsigned int LineSpeed;
+    unsigned int MTU;
     char *Name;
     char *Dev;
     char *RemoteDev;
@@ -44,7 +48,7 @@ typedef struct
     char *ClientID;
     char *DNS;
     char *PPPAuth;
-    unsigned int MTU;
+    char *ServerAuth;
 } TVpn;
 
 TVpn *VpnCtxCreate(const char *Type, const char *Name, const char *Server);

@@ -37,7 +37,7 @@ static void OpenVpnShutDown(TVpn *Vpn, const char *Dev)
         RunCommand(Cmd, CMD_ASROOT);
     }
 
-		TunShutdown(Dev);
+    TunShutdown(Dev);
     Destroy(Tempstr);
     Destroy(Cmd);
 }
@@ -45,26 +45,26 @@ static void OpenVpnShutDown(TVpn *Vpn, const char *Dev)
 
 static const char *OpenVpnReadLineSkipDateTime(const char *Line)
 {
-char *Token=NULL;
-const char *ptr;
+    char *Token=NULL;
+    const char *ptr;
 
-ptr=GetToken(Line, "\\S", &Token, 0);
-if (StrLen(Token) == 3) //1st token is 3-letter day name
-{
+    ptr=GetToken(Line, "\\S", &Token, 0);
+    if (StrLen(Token) == 3) //1st token is 3-letter day name
+    {
         ptr=GetToken(ptr, "\\S", &Token, 0); //month
         ptr=GetToken(ptr, "\\S", &Token, 0); //day
         ptr=GetToken(ptr, "\\S", &Token, 0); //time
         ptr=GetToken(ptr, "\\S", &Token, 0); //year
-}
-else //date/time format is YYYY-mm-dd HH:MM:SS
-{
+    }
+    else //date/time format is YYYY-mm-dd HH:MM:SS
+    {
         ptr=GetToken(ptr, "\\S", &Token, 0); //date
         ptr=GetToken(ptr, "\\S", &Token, 0); //time
-}
+    }
 
-Destroy(Token);
+    Destroy(Token);
 
-return(ptr);
+    return(ptr);
 }
 
 
@@ -73,7 +73,7 @@ static char *OpenVpnProcess(char *Dev, TVpn *Vpn, STREAM *S)
     char *Tempstr=NULL, *Token=NULL;
     const char *ptr;
 
-		Dev=CopyStr(Dev, "????");
+    Dev=CopyStr(Dev, "????");
     Tempstr=STREAMReadLine(Tempstr, S);
     while (Tempstr)
     {
@@ -93,19 +93,19 @@ static char *OpenVpnProcess(char *Dev, TVpn *Vpn, STREAM *S)
             ptr=GetToken(ptr, "\\S", &Dev, 0);  //device name
             VpnUp(Vpn, Dev);
         }
-        else if (strcmp(Token, "TUN/TAP")==0) 
-				{
+        else if (strcmp(Token, "TUN/TAP")==0)
+        {
             ptr=GetToken(ptr, "\\S", &Token, 0);  //'set'
-						if (strcmp(Token, "device")==0) ptr=GetToken(ptr, "\\S", &Dev, 0);  //'set'
-				}
+            if (strcmp(Token, "device")==0) ptr=GetToken(ptr, "\\S", &Dev, 0);  //'set'
+        }
         else if (strcmp(Token, "ERROR:")==0) TerminalPrint(Terminal, "~rERROR:~0 %s\n", ptr);
         else if (strcmp(Token, "WARNING:")==0) TerminalPrint(Terminal, "~yWARNING:~0 %s\n", ptr);
         else if (strcmp(Token, "Initialization")==0)
-				{
+        {
             ptr=GetToken(ptr, "\\S", &Token, 0);  //'Sequence'
             ptr=GetToken(ptr, "\\S", &Token, 0);  //should be 'Completed'
             if (strcmp(Token, "Completed")==0) VpnUp(Vpn, Dev);
-				}
+        }
         else if (strcmp(Token, "Exiting")==0)
         {
             if (! (GlobalFlags & (FLAG_DEBUG | FLAG_VERBOSE))) TerminalPrint(Terminal, "~rERROR:~0 openvpn exited unexpectedly. run vpn_mgr with -verbose or -debug to get more info.\n");
@@ -118,7 +118,7 @@ static char *OpenVpnProcess(char *Dev, TVpn *Vpn, STREAM *S)
     Destroy(Tempstr);
     Destroy(Token);
 
-return(Dev);
+    return(Dev);
 }
 
 

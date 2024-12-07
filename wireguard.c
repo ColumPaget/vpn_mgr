@@ -111,7 +111,7 @@ int WireguardUp(TVpn *Vpn)
         {
             VpnUp(Vpn, Dev);
 
-						//keep reading stuff from stdin, so that the user can use
+            //keep reading stuff from stdin, so that the user can use
             //ctrl-c to shut vpn down
             Tempstr=STREAMReadLine(Tempstr, Terminal);
             while (Tempstr)

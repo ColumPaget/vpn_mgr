@@ -1,6 +1,6 @@
 #include "command_line.h"
 #include "vpn_ctx.h"
-#include "help.h"
+
 
 static int IsServerURL(const char *Server)
 {
@@ -16,8 +16,6 @@ static int IsServerURL(const char *Server)
     if (strncmp(Server, "pppssl:", 7)==0) return(TRUE);
     if (strncmp(Server, "ptls:", 5)==0) return(TRUE);
     if (strncmp(Server, "ppptls:", 7)==0) return(TRUE);
-
-
 
     return(FALSE);
 }
@@ -80,7 +78,10 @@ TVpn *ParseCommandLine(int argc, char *argv[])
             Server=CopyStr(Server, "");
         }
     }
-    else PrintHelp();
+    else if (strcasecmp(Action, "version")==0) Action=CopyStr(Action, "version");
+    else if (strcasecmp(Action, "-version")==0) Action=CopyStr(Action, "version");
+    else if (strcasecmp(Action, "--version")==0) Action=CopyStr(Action, "version");
+    else Action=CopyStr(Action, "help");
 
 
     if (CommandLineValid(Action, Name, Server))
@@ -127,6 +128,7 @@ TVpn *ParseCommandLine(int argc, char *argv[])
                 else if (strcmp(Arg, "-nodns")==0) GlobalFlags |= FLAG_NODNS;
                 else if (strcmp(Arg, "-mtu")==0) Ctx->MTU=atoi(CommandLineNext(Cmd));
                 else if (strcmp(Arg, "-ppp-auth")==0) Ctx->PPPAuth=CopyStr(Ctx->PPPAuth, CommandLineNext(Cmd));
+                else if (strcmp(Arg, "-ppp-speed")==0) Ctx->LineSpeed=atoi(CommandLineNext(Cmd));
                 else if (strcmp(Arg, "-up")==0) Ctx->UpFile=CopyStr(Ctx->UpFile, CommandLineNext(Cmd));
                 else if (strcmp(Arg, "-down")==0) Ctx->DownFile=CopyStr(Ctx->DownFile, CommandLineNext(Cmd));
                 else if (strcmp(Arg, "-local-sudo")==0) GlobalFlags= (GlobalFlags & ~FLAG_SU) | FLAG_SUDO;
@@ -139,8 +141,11 @@ TVpn *ParseCommandLine(int argc, char *argv[])
                 else if (strcmp(Arg, "-s")==0) GlobalFlags |= FLAG_REMOTE_SU;
                 else if (strcmp(Arg, "-S")==0) GlobalFlags |= FLAG_REMOTE_SUDO;
                 else if (strcmp(Arg, "-N")==0) GlobalFlags &= ~(FLAG_REMOTE_SU |  FLAG_REMOTE_SUDO);
+                else if (strcmp(Arg, "-auth")==0) Ctx->ServerAuth=CopyStr(Ctx->ServerAuth, CommandLineNext(Cmd));
                 else if (strcmp(Arg, "-debug")==0) GlobalFlags |= FLAG_DEBUG;
                 else if (strcmp(Arg, "-verbose")==0) GlobalFlags |= FLAG_VERBOSE;
+                else if (strcmp(Arg, "-version")==0) GlobalFlags |= FLAG_VERBOSE;
+                else if (strcmp(Arg, "--version")==0) GlobalFlags |= FLAG_VERBOSE;
 
 
                 Arg=CommandLineNext(Cmd);

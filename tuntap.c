@@ -22,9 +22,9 @@ int TunAvailable()
 
     RunCommand("chmod a+rw /dev/net/tun", CMD_ASROOT);
 
-    if (access(TUN_PATH, F_OK) !=0) TerminalPrint(Terminal, "~e~cTUN:~0~e~rERROR~0. %s does not seem to exist\n", TUN_PATH);
-    else if (access(TUN_PATH, W_OK) !=0) TerminalPrint(Terminal, "~e~cTUN:~0~e~rERROR~0. %s not writeable\n", TUN_PATH);
-    else if (access(TUN_PATH, R_OK) !=0) TerminalPrint(Terminal, "~e~cTUN:~0~e~rERROR~0. %s not readable\n", TUN_PATH);
+    if (access(TUN_PATH, F_OK) !=0) LogEvent(VPN_LOG_SYSLOG | VPN_LOG_ERROR, "TUN", "error: %s does not seem to exist", TUN_PATH);
+    else if (access(TUN_PATH, W_OK) !=0) LogEvent(VPN_LOG_SYSLOG | VPN_LOG_ERROR, "TUN", "error: %s not writeable", TUN_PATH);
+    else if (access(TUN_PATH, R_OK) !=0) LogEvent(VPN_LOG_SYSLOG | VPN_LOG_ERROR, "TUN", "error: %s not readable", TUN_PATH);
     else result=TRUE;
 
     return(result);
@@ -66,7 +66,7 @@ int TunSetup(const char *Type, const char *Name, const char *Address)
 
         if (! NetDevExists(Name)) status=RUN_CMD_FAIL;
     }
-    else TerminalPrint(Terminal, "~e~cTUN:~0~e~rFATAL~0. Failed to create interface [~e%s~0]\n", Name);
+    else LogEvent(VPN_LOG_SYSLOG | VPN_LOG_ERROR, "TUN", "fatal: Failed to create interface %s", Name);
 
     Destroy(Tempstr);
 
@@ -78,7 +78,7 @@ void TunShutdown(const char *Dev)
 {
     char *Tempstr=NULL;
 
-		TerminalPrint(Terminal, "~e~cTUN:~0 shutdown local tun devices [~e%s~0]\n", Dev);
+    TerminalPrint(Terminal, "~e~cTUN:~0 shutdown local tun devices [~e%s~0]\n", Dev);
     Tempstr=MCopyStr(Tempstr, "ip link set dev ", Dev, " down ", NULL);
     RunCommand(Tempstr, CMD_ASROOT);
 

@@ -16,6 +16,8 @@ TVpn *VpnCtxCreate(const char *Action, const char *Name, const char *Server)
     else if (strcmp(Action, "server")==0) Vpn->Action=ACT_SERVER;
     else if (strcmp(Action, "list")==0) Vpn->Action=ACT_LIST;
     else if (strcmp(Action, "protocols")==0) Vpn->Action=ACT_PROTOCOLS;
+    else if (strcmp(Action, "version")==0) Vpn->Action=ACT_VERSION;
+    else if (strcmp(Action, "help")==0) Vpn->Action=ACT_HELP;
     else Vpn->Action=ACT_CONNECT;
 
     switch (Vpn->Action)
@@ -40,7 +42,7 @@ TVpn *VpnCtxCreate(const char *Action, const char *Name, const char *Server)
     Vpn->UpFile=MCatStr(Vpn->UpFile, "/etc/vpn_mgr/default.up", NULL);
     if (StrValid(Name)) Vpn->DownFile=MCopyStr(Vpn->DownFile, "/etc/vpn_mgr/", Name, ".down:", NULL);
     Vpn->DownFile=MCatStr(Vpn->DownFile, "/etc/vpn_mgr/default.down", NULL);
-
+		Vpn->LineSpeed=4000000;
 
     return(Vpn);
 }

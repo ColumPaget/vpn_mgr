@@ -10,6 +10,7 @@
 #include "ssl_server.h"
 #include "ssl_client.h"
 #include "route.h"
+#include "help.h"
 
 void DisplayProtocolSupport(const char *Name, const char *ReqProgs)
 {
@@ -52,7 +53,8 @@ void DisplaySupportedProtocols()
 int main(int argc, char *argv[])
 {
     TVpn *Vpn;
-    char *Tempstr=NULL;
+    char *Tempstr=NULL, *Token=NULL;
+    const char *ptr;
 
     setpgid(0, getpid());
 
@@ -62,8 +64,10 @@ int main(int argc, char *argv[])
     //if we are not root or suid root, then assume we will need local su/sudo
     if (geteuid() != 0) GlobalFlags |= FLAG_SUDO | FLAG_SU;
 
-    Terminal=STREAMFromDualFD(0,1);
-    TerminalInit(Terminal, TERM_RAWKEYS | TERM_SAVEATTRIBS);
+    //we will get stopped if we are a background process and try
+    //to alter the terminal, so we need to ignore SIGTTOU
+    signal(SIGTTOU, SIG_IGN);
+
 
 //    signal(SIGKILL, SignalHandler);
 //    signal(SIGTERM, SignalHandler);
@@ -74,6 +78,9 @@ int main(int argc, char *argv[])
 
     if (Vpn)
     {
+    Terminal=STREAMFromDualFD(0,1);
+    if (isatty(1)) TerminalInit(Terminal, TERM_RAWKEYS | TERM_SAVEATTRIBS);
+
         switch (Vpn->Action)
         {
         case ACT_CONFIG:
@@ -99,25 +106,42 @@ int main(int argc, char *argv[])
         case ACT_CONNECT:
             if (! StrValid(Vpn->Server)) ReadConfig(Vpn);
 
-            if (strncasecmp(Vpn->Server, "wg:", 3)==0) WireguardUp(Vpn);
-            else if (strncasecmp(Vpn->Server, "openvpn:", 8)==0) OpenVpnUp(Vpn);
-            else if (strncasecmp(Vpn->Server, "ovpn:", 5)==0) OpenVpnUp(Vpn);
-            else if (strncasecmp(Vpn->Server, "ssh:", 4)==0) SSHVpnUp(Vpn);
-            else if (strncasecmp(Vpn->Server, "pssh:", 5)==0) PPPSSHVpnUp(Vpn);
-            else if (strncasecmp(Vpn->Server, "pppssh:", 7)==0) PPPSSHVpnUp(Vpn);
-            else if (strncasecmp(Vpn->Server, "pppssl:", 7)==0) PPPSSLClientVpnUp(Vpn);
-            else if (strncasecmp(Vpn->Server, "ppptls:", 7)==0) PPPSSLClientVpnUp(Vpn);
+            if (StrValid(Vpn->Server))
+            {
+                GetToken(Vpn->Server, ":", &Token, 0);
+                if (strcasecmp(Token, "wg")==0) WireguardUp(Vpn);
+                else if (strcasecmp(Token, "ssh")==0) SSHVpnUp(Vpn);
+                else if (strcasecmp(Token, "openvpn")==0) OpenVpnUp(Vpn);
+                else if (strcasecmp(Token, "ovpn")==0) OpenVpnUp(Vpn);
+                else if (strcasecmp(Token, "pssh")==0) PPPSSHVpnUp(Vpn);
+                else if (strcasecmp(Token, "pppssh")==0) PPPSSHVpnUp(Vpn);
+                else if (strcasecmp(Token, "pssl")==0) PPPSSLClientVpnUp(Vpn);
+                else if (strcasecmp(Token, "pppssl")==0) PPPSSLClientVpnUp(Vpn);
+                else if (strcasecmp(Token, "ptls")==0) PPPSSLClientVpnUp(Vpn);
+                else if (strcasecmp(Token, "ppptls")==0) PPPSSLClientVpnUp(Vpn);
+                else TerminalPrint(Terminal, "~rERROR~0: unknown vpn type '%s'\n", Token);
+            }
+            else TerminalPrint(Terminal, "~rERROR~0: no Server URL given. URL must begin with one of: 'wg:, ssh:, openvpn:, ovpn:, pppssh:, pssh:, pppssh: or ppptls:'\n");
+
             break;
 
         case ACT_SERVER:
             if (strncasecmp(Vpn->Server, "wg:", 3)==0) WireguardUp(Vpn);
             else SSLServer(Vpn);
             break;
-        }
 
+				case ACT_VERSION:
+						PrintVersion();
+				break;
+
+				case ACT_HELP:
+						PrintHelp();
+				break;
+
+        }
+    TerminalReset(Terminal);
     }
 
-    TerminalReset(Terminal);
     Destroy(Tempstr);
 
     //make sure any programs we launched that are still running are shut down

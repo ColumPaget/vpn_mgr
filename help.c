@@ -1,5 +1,13 @@
 #include "help.h"
 
+
+
+void PrintVersion()
+{
+printf("vpn_mgr: version %s\n", VERSION);
+}
+
+
 void PrintHelp()
 {
     printf("Usage:\n");
@@ -55,6 +63,7 @@ void PrintHelp()
     printf("  -dns peer             use dns server list supplied by ppp based vpns\n");
     printf("  -nodns                do not use dns servers saved in vpn config\n");
     printf("  -ppp-auth             use ppp-chap authentication\n");
+    printf("  -ppp-speed <speed>    linespeed/baud-rate for pppd\n");
     printf("  -id <string>          set a 'client id' string. Currently only used to set the ipparam of ppp-based networks in order to identify who/what is connecting and allow setting per-connection rules on the server.\n");
     printf("  -cid <string>         set a 'client id' string. Currently only used to set the ipparam of ppp-based networks in order to identify who/what is connecting and allow setting per-connection rules on the server.\n");
     printf("  -mtu <mtu>            mtu value for openvpn and ppp based vpns\n");

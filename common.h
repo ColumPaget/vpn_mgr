@@ -14,10 +14,19 @@
 #define FLAG_DEBUG        2048
 #define FLAG_VERBOSE      4096
 
+
+#define VPN_LOG_SYSLOG 1
+#define VPN_LOG_ERROR 2
+#define VPN_LOG_OKAY 4
+#define VPN_LOG_INFO 8
+
+#define VERSION "2.0"
+
 extern STREAM *Terminal;
 extern int GlobalFlags;
 
 void SignalHandler(int sig);
 char *ReadFile(char *RetStr, const char *Path);
+void LogEvent(int LogFlags, const char *Title, const char *Fmt, ...);
 
 #endif

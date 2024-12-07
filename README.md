@@ -68,12 +68,13 @@ OPTIONS
   -local-sudo           force use of sudo locally, rather than trying both sudo and su
   -local-su             force use of su locally, rather than trying both sudo and su
   -remote-sudo          force use of sudo at remote end, rather than trying both sudo and su
-  -remote-su            force use of su at remote end, rather than trying both sudo an[?9l[?1000ld su
+  -remote-su            force use of su at remote end, rather than trying both sudo and su
   -N                    use neither su or sudo at the remote end, assume remote is setup to run with root permission
   -dns <ip list>        comma-separated list of dns servers to use with this vpn
   -dns peer             use dns server list supplied by ppp based vpns
   -nodns                do not use dns servers saved in vpn config
   -ppp-auth             use ppp-chap authentication
+  -ppp-speed <speed>    set linespeed/baudrate for ppp
   -id <string>          set a 'client id' string. Currently only used to set the ipparam of ppp-based networks in order to identify who/what is connecting and allow setting per-connection rules on the server.
   -cid <string>         set a 'client id' string. Currently only used to set the ipparam of ppp-based networks in order to identify who/what is connecting and allow setting per-connection rules on the server.
   -mtu <mtu>            mtu value for openvpn and ppp based vpns
@@ -172,15 +173,18 @@ PPP OVER TLS/SSL VPNS
 vpn_mgr can connect to vpns that run ppp over a tls (aka ssl) connection. There's numerous ways of setting up a ppp-over-tls server, using stunnel, ncat or vpn_mgr itself. vpn_mgr can be used at the server end with a command like so:
 
 ```
-vpn_mgr server tls:0.0.0.0:9999
+vpn_mgr server tls:0.0.0.0:9999 -ca /etc/ssl/myhost.ca -cert /etc/ssl/myhost.cert -key /etc/ssl/myhost.key
 ```
 
 The above example runs a tls/ssl server on port 9999. This server will be available on all network interfaces, due to the '0.0.0.0' address component. In order to only run the server on a specific network interface supply that interface's IP address, like so:
 
 
 ```
-vpn_mgr server tls:192.168.1.1:9999
+vpn_mgr server tls:192.168.1.1:9999 -ca /etc/ssl/myhost.ca -cert /etc/ssl/myhost.cert -key /etc/ssl/myhost.key
 ```
+
+The '-cert' argument supplies the path to the server's host certificate. Similarly '-key' supplies the path to the servers' private keyfile. Finally the '-ca' argument supplies the path to the 'certificate authority' certificate that's been used to sign user authentication certificates.
+
 
 
 Other methods of creating a tls server include stunnel. Here is an example stunnel config file:

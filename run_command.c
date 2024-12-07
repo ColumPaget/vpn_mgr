@@ -106,7 +106,7 @@ char *RunCmdSetup(char *RetStr, const char *Cmd, int Flags)
 
     RetStr=CopyStr(RetStr, "");
     ptr=GetToken(Cmd, "\\S", &Token, 0);
-		if (*Token =='/') path=Token; //we have a full path
+    if (*Token =='/') path=Token; //we have a full path
     else path=GetCommandPath(Token);
     if (! StrValid(path))
     {
@@ -129,17 +129,21 @@ int RunCommandCleanUp(STREAM *S, int Flags)
 {
     const char *ptr;
     pid_t pid=-1;
-    int status;
+    int status=0, result;
+    char *Tempstr=NULL;
 
     ptr=STREAMGetValue(S, "PeerPID");
+
     if (StrValid(ptr))
     {
         pid=atoi(ptr);
         if ((pid > -1) && (Flags & CMD_KILL)) kill(0-pid, SIGTERM);
-        waitpid(pid, &status, 0);
+        result=waitpid(pid, &status, 0);
+        Tempstr=FormatStr(Tempstr, "%d", WEXITSTATUS(status));
+        STREAMSetValue(S, "ExitStatus", Tempstr);
     }
-    STREAMClose(S);
 
+    Destroy(Tempstr);
     if (status == 0) return(RUN_CMD_OKAY);
     return(RUN_CMD_FAIL);
 }
@@ -321,6 +325,7 @@ int RunCommand(const char *Cmd, int Flags)
             Tempstr=STREAMReadLine(Tempstr, S);
         }
         result=RunCommandCleanUp(S, Flags);
+        STREAMClose(S);
     }
     else
     {

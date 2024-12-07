@@ -369,12 +369,13 @@ int SSHVpnUp(TVpn *Vpn)
             //setup the REMOTE end of the vpn
             if (SSHSetup(Vpn, S))
             {
-								VpnUp(Vpn, Dev);
+                VpnUp(Vpn, Dev);
                 Active=S;
                 TerminalPrint(Terminal, "~gVPN UP:~0 dev=%s\n", Dev);
                 SSHProcess(Vpn, S);
             }
             RunCommandCleanUp(S, CMD_KILL);
+						STREAMClose(S);
             VpnDown(Vpn, Dev);
         }
     }
