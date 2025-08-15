@@ -375,7 +375,7 @@ int SSHVpnUp(TVpn *Vpn)
                 SSHProcess(Vpn, S);
             }
             RunCommandCleanUp(S, CMD_KILL);
-						STREAMClose(S);
+            STREAMClose(S);
             VpnDown(Vpn, Dev);
         }
     }

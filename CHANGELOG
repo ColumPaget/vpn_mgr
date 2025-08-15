@@ -1,3 +1,7 @@
+v2.1 (2025-08-15)
+-----------------
+  * add -auth option to TLS server, enabling extra authentication schemes
+
 v2.0 (2024-12-06)
 -----------------
   * Handle SIGTTOU so program doesn't get frozen when run in background

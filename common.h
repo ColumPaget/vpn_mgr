@@ -20,7 +20,7 @@
 #define VPN_LOG_OKAY 4
 #define VPN_LOG_INFO 8
 
-#define VERSION "2.0"
+#define VERSION "2.1"
 
 extern STREAM *Terminal;
 extern int GlobalFlags;

@@ -4,7 +4,7 @@
 
 void PrintVersion()
 {
-printf("vpn_mgr: version %s\n", VERSION);
+    printf("vpn_mgr: version %s\n", VERSION);
 }
 
 
@@ -67,6 +67,7 @@ void PrintHelp()
     printf("  -id <string>          set a 'client id' string. Currently only used to set the ipparam of ppp-based networks in order to identify who/what is connecting and allow setting per-connection rules on the server.\n");
     printf("  -cid <string>         set a 'client id' string. Currently only used to set the ipparam of ppp-based networks in order to identify who/what is connecting and allow setting per-connection rules on the server.\n");
     printf("  -mtu <mtu>            mtu value for openvpn and ppp based vpns\n");
+    printf("  -auth <config>        authentication config when running in SSL-server mode. This can have the values 'cert' to specify that a valid certificate is enough, 'system' to specify a valid certificate whose common name is a user in /etc/passwd, 'users:<list>' where <list> is a comma-separated list of usernames that one of which must match in addition to the certificate being valid, 'ips:<list>' where <list> is a comma-separated list of IPs that must match in addition to the certificate being valid and 'ip-only:<list>' which provides a list of IP addresses that can log on even if their certificate is invalid (e.g. certificate has expired\n");
     printf("  -verbose              output more info about what vpn_mgr is doing\n");
     printf("  -debug                spew lots of debugging info\n");
 

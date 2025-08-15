@@ -10,39 +10,63 @@
 
 static int SSLAuth(TVpn *Vpn, STREAM *S)
 {
-    const char *ptr, *p_UserName;
+    const char *ptr, *p_UserName, *p_PeerIP;
     char *Token=NULL;
     int AuthFlags=0;
     int RetVal=FALSE;
 
+    p_PeerIP=STREAMGetValue(S, "PeerIP");
 
+    //did we specify the need for a specific username?
+    p_UserName=STREAMGetValue(S, "SSL:CertificateCommonName");
+    if (StrValid(p_UserName))
+		{
     // has the certificate been verified?
     ptr=STREAMGetValue(S,"SSL:CertificateVerify");
     if (StrValid(ptr) && (strcmp(ptr, "OK")==0) ) AuthFlags |= SSL_AUTH_CERTIFICATE;
 
-    //did we specify the need for a specific username?
-    p_UserName=STREAMGetValue(S, "SSL:CertificateCommonName");
+    LogEvent(VPN_LOG_SYSLOG| VPN_LOG_OKAY, "NEW CLIENT:", "%s@%s  CertificateStatus: %s. CertificateIssuer: %s. Encryption: %s. RequiredAuthLevel: %s",  p_UserName, p_PeerIP, ptr, STREAMGetValue(S, "SSL:CertificateIssuer"), STREAMGetValue(S, "SSL:CipherDetails"), Vpn->ServerAuth);
+    }
+
     if (StrValid(Vpn->ServerAuth))
     {
-        // 'cert' means that just having a recognized certificate is enough
-        if (strcasecmp(Vpn->ServerAuth, "cert")==0) AuthFlags |= SSL_AUTH_USER;
-        // 'system' means the username must exist as a real user in /etc/passwd or equivalent
-        else if (strcasecmp(Vpn->ServerAuth, "system")==0)
+        if (CompareStrNoCase(Vpn->ServerAuth, "open")==0) AuthFlags |= SSL_AUTH_OKAY;
+
+        if (StrValid(p_UserName))
         {
-            if (StrValid(p_UserName) && getpwnam(p_UserName)) AuthFlags |= SSL_AUTH_USER;
-        }
-        //finally we can have a list of allowed users
-        else
-        {
-            ptr=GetToken(Vpn->ServerAuth, ",", &Token, 0);
-            while (ptr)
+            // 'cert' means that just having a recognized certificate is enough
+            if (CompareStrNoCase(Vpn->ServerAuth, "cert")==0) AuthFlags |= SSL_AUTH_USER;
+            // 'system' means the username must exist as a real user in /etc/passwd or equivalent
+            else if (CompareStrNoCase(Vpn->ServerAuth, "system")==0)
             {
-                if (strcmp(p_UserName, Token)==0) AuthFlags |= SSL_AUTH_USER;
-                ptr=GetToken(ptr, ",", &Token, 0);
+                if (StrValid(p_UserName) && getpwnam(p_UserName)) AuthFlags |= SSL_AUTH_USER;
+            }
+            else if (strncasecmp(Vpn->ServerAuth, "users:", 6)==0)
+            {
+                ptr=Vpn->ServerAuth+6;
+                while (isspace(*ptr)) ptr++;
+ 	               if (InStringList(p_UserName, ptr, ",")) AuthFlags |= SSL_AUTH_USER;
+                else LogEvent(VPN_LOG_SYSLOG| VPN_LOG_OKAY, "CLIENT AUTH", "[%s] not in list of allowed users: %s\n", p_UserName, ptr);
+					}
+            else if (strncasecmp(Vpn->ServerAuth, "ips:", 4)==0)
+            {
+                ptr=Vpn->ServerAuth+4;
+                while (isspace(*ptr)) ptr++;
+                if (InStringList(p_PeerIP, ptr, ",")) AuthFlags |= SSL_AUTH_USER;
+                else LogEvent(VPN_LOG_SYSLOG| VPN_LOG_OKAY, "CLIENT AUTH", "[%s] not in list of allowed ips: %s\n", p_PeerIP, ptr);
+            }
+            else if (strncasecmp(Vpn->ServerAuth, "ip-only:", 8)==0)
+            {
+                ptr=Vpn->ServerAuth+8;
+                while (isspace(*ptr)) ptr++;
+                if (InStringList(p_PeerIP, ptr, ",")) AuthFlags |= SSL_AUTH_OKAY;
+                else LogEvent(VPN_LOG_SYSLOG| VPN_LOG_OKAY, "CLIENT AUTH", "[%s] not in list of allowed ips: %s\n", p_PeerIP, ptr);
             }
         }
+        else LogEvent(VPN_LOG_SYSLOG| VPN_LOG_OKAY, "NEW CLIENT:", "%s Lacks Certificate. RequiredAuthLevel: %s", STREAMGetValue(S, "PeerIP"), Vpn->ServerAuth);
     }
     else AuthFlags |= SSL_AUTH_USER;
+
 
     if (AuthFlags == SSL_AUTH_OKAY)
     {

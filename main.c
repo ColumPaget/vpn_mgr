@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
 
     if (Vpn)
     {
-    Terminal=STREAMFromDualFD(0,1);
-    if (isatty(1)) TerminalInit(Terminal, TERM_RAWKEYS | TERM_SAVEATTRIBS);
+        Terminal=STREAMFromDualFD(0,1);
+        if (isatty(1)) TerminalInit(Terminal, TERM_RAWKEYS | TERM_SAVEATTRIBS);
 
         switch (Vpn->Action)
         {
@@ -130,16 +130,16 @@ int main(int argc, char *argv[])
             else SSLServer(Vpn);
             break;
 
-				case ACT_VERSION:
-						PrintVersion();
-				break;
+        case ACT_VERSION:
+            PrintVersion();
+            break;
 
-				case ACT_HELP:
-						PrintHelp();
-				break;
+        case ACT_HELP:
+            PrintHelp();
+            break;
 
         }
-    TerminalReset(Terminal);
+        TerminalReset(Terminal);
     }
 
     Destroy(Tempstr);

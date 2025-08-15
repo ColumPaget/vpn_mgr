@@ -42,7 +42,7 @@ TVpn *VpnCtxCreate(const char *Action, const char *Name, const char *Server)
     Vpn->UpFile=MCatStr(Vpn->UpFile, "/etc/vpn_mgr/default.up", NULL);
     if (StrValid(Name)) Vpn->DownFile=MCopyStr(Vpn->DownFile, "/etc/vpn_mgr/", Name, ".down:", NULL);
     Vpn->DownFile=MCatStr(Vpn->DownFile, "/etc/vpn_mgr/default.down", NULL);
-		Vpn->LineSpeed=4000000;
+    Vpn->LineSpeed=4000000;
 
     return(Vpn);
 }

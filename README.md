@@ -78,6 +78,7 @@ OPTIONS
   -id <string>          set a 'client id' string. Currently only used to set the ipparam of ppp-based networks in order to identify who/what is connecting and allow setting per-connection rules on the server.
   -cid <string>         set a 'client id' string. Currently only used to set the ipparam of ppp-based networks in order to identify who/what is connecting and allow setting per-connection rules on the server.
   -mtu <mtu>            mtu value for openvpn and ppp based vpns
+  -auth <config>        authentication config when running in SSL-server mode. This can have the values 'cert' to specify that a valid certificate is enough, 'system' to specify a valid certificate whose common name is a user in /etc/passwd, 'users:<list>' where <list> is a comma-separated list of usernames that one of which must match in addition to the certificate being valid, 'ips:<list>' where <list> is a comma-separated list of IPs that must match in addition to the certificate being valid and 'ip-only:<list>' which provides a list of IP addresses that can log on even if their certificate is invalid (e.g. certificate has expired)
   -verbose              output more info about what vpn_mgr is doing
   -debug                spew lots of debugging info
 ```
@@ -184,6 +185,37 @@ vpn_mgr server tls:192.168.1.1:9999 -ca /etc/ssl/myhost.ca -cert /etc/ssl/myhost
 ```
 
 The '-cert' argument supplies the path to the server's host certificate. Similarly '-key' supplies the path to the servers' private keyfile. Finally the '-ca' argument supplies the path to the 'certificate authority' certificate that's been used to sign user authentication certificates.
+
+
+More Authentication can be added to the server with the '-auth' option. Only one of these extra authentication methods can be active. Available options are:
+
+open
+: allow all connections. NEVER use this on the open internet.
+
+cert                  
+: a validated certificate is sufficient authentication. (this is the default if -auth is not present)
+
+system                 
+: a valid certificate is required, and it's common-name must match a user in /etc/passwd
+
+users:<list>
+: a valid certificate is required, and it's common-name must match an item in comma-separated list '<list>'
+
+ips:<list>
+: a valid certificate is required, and the peers IP address must match an item in comma-separated list '<list>'
+
+ip-only:<list>
+: a valid certificate is NOT required. The peers IP address must match an item in comma-separated list '<list>'. This allows connections from trusted IPs that have expired certificates.
+
+
+for example:
+
+```
+vpn_mgr server tls:0.0.0.0:9999 -ca /etc/ssl/myhost.ca -cert /etc/ssl/myhost.cert -key /etc/ssl/myhost.key -auth ip:192.168.1.10,192.168.1.11
+```
+
+will only allow connections from hosts 192.168.1.10 and 192.168.1.11 provided they have a certificate that can be validated against /etc/ssl/myhost.ca
+
 
 
 
