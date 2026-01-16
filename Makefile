@@ -5,8 +5,8 @@ FLAGS=-g -DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" -DPAC
 all: $(OBJ) 
 	gcc $(FLAGS) -ovpn_mgr main.c $(OBJ) $(LIBS)
 
-libUseful-5/libUseful.a:
-	$(MAKE) -C libUseful-5
+libUseful-bundled/libUseful.a:
+	$(MAKE) -C libUseful-bundled
 
 common.o: common.h common.c
 	gcc $(FLAGS) -c common.c

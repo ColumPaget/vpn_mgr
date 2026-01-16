@@ -135,11 +135,13 @@ TVpn *ParseCommandLine(int argc, char *argv[])
                 else if (strcmp(Arg, "-local-su")==0) GlobalFlags= (GlobalFlags & ~FLAG_SUDO) | FLAG_SU;
                 else if (strcmp(Arg, "-remote-sudo")==0) GlobalFlags = (GlobalFlags & ~FLAG_REMOTE_SU) | FLAG_REMOTE_SUDO;
                 else if (strcmp(Arg, "-remote-su")==0) GlobalFlags = (GlobalFlags & ~FLAG_REMOTE_SUDO) | FLAG_REMOTE_SU;
-                else if (strcmp(Arg, "-V")==0) Ctx->Flags |= VPN_VERIFY_PEER;
-                else if (strcmp(Arg, "-verify")==0) Ctx->Flags |= VPN_VERIFY_PEER;
-                else if (strcmp(Arg, "-tcp")==0) Ctx->Flags |= VPN_TCP;
                 else if (strcmp(Arg, "-s")==0) GlobalFlags |= FLAG_REMOTE_SU;
                 else if (strcmp(Arg, "-S")==0) GlobalFlags |= FLAG_REMOTE_SUDO;
+                else if (strcmp(Arg, "-tcp")==0) Ctx->Flags |= VPN_TCP;
+                else if (strcmp(Arg, "-timeout")==0) Ctx->Timeout=ParseDuration(CommandLineNext(Cmd));
+                else if (strcmp(Arg, "-T")==0) Ctx->Timeout=ParseDuration(CommandLineNext(Cmd));
+                else if (strcmp(Arg, "-V")==0) Ctx->Flags |= VPN_VERIFY_PEER;
+                else if (strcmp(Arg, "-verify")==0) Ctx->Flags |= VPN_VERIFY_PEER;
                 else if (strcmp(Arg, "-N")==0) GlobalFlags &= ~(FLAG_REMOTE_SU |  FLAG_REMOTE_SUDO);
                 else if (strcmp(Arg, "-auth")==0) Ctx->ServerAuth=CopyStr(Ctx->ServerAuth, CommandLineNext(Cmd));
                 else if (strcmp(Arg, "-debug")==0) GlobalFlags |= FLAG_DEBUG;

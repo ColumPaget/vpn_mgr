@@ -176,6 +176,7 @@ void SSLServer(TVpn *Vpn)
         {
             if (S==Server) SSLAcceptClient(Vpn, Connections, Server);
             else SSLProcess(Connections, S);
+            waitpid(-1, NULL, WNOHANG);
         }
     }
 

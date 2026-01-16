@@ -1,7 +1,11 @@
 #ifndef VPN_MGR_COMMON_H
 #define VPN_MGR_COMMON_H
 
+#ifdef LIBUSEFUL_BUNDLED
+#include "libUseful-bundled/libUseful.h"
+#else
 #include "libUseful-5/libUseful.h"
+#endif
 
 #define FLAG_EXIT            1
 #define FLAG_SU              2
@@ -20,7 +24,7 @@
 #define VPN_LOG_OKAY 4
 #define VPN_LOG_INFO 8
 
-#define VERSION "2.1"
+#define VERSION "2.2"
 
 extern STREAM *Terminal;
 extern int GlobalFlags;

@@ -1,6 +1,21 @@
 #include "vpn_config.h"
 #include <glob.h>
 
+
+static char *ReadFileConf(char *RetStr, const char *Value)
+{
+RetStr=CopyStr(RetStr, "");
+
+if (StrValid(Value))
+{
+if (strncmp(Value, "~/", 2)==0) RetStr=MCopyStr(RetStr, GetCurrUserHomeDir(), Value+1, NULL);
+else RetStr=CopyStr(RetStr, Value);
+}
+
+return(RetStr);
+}
+
+
 void ReadConfigLine(TVpn *Vpn, const char *Line)
 {
     char *Key=NULL, *Value=NULL;
@@ -10,20 +25,23 @@ void ReadConfigLine(TVpn *Vpn, const char *Line)
     while (ptr)
     {
         if (strcasecmp(Key, "Server")==0) Vpn->Server=CopyStr(Vpn->Server, Value);
-        if (strcasecmp(Key, "ClientCert")==0) Vpn->ClientCert=CopyStr(Vpn->ClientCert, Value);
-        if (strcasecmp(Key, "ClientKey")==0) Vpn->ClientKey=CopyStr(Vpn->ClientKey, Value);
-        if (strcasecmp(Key, "VerifyCert")==0) Vpn->VerifyCert=CopyStr(Vpn->VerifyCert, Value);
-        if (strcasecmp(Key, "ServerCert")==0) Vpn->VerifyCert=CopyStr(Vpn->VerifyCert, Value);
+
+        if (strcasecmp(Key, "ClientCert")==0) Vpn->ClientCert=ReadFileConf(Vpn->ClientCert, Value);
+        if (strcasecmp(Key, "ClientKey")==0) Vpn->ClientKey=ReadFileConf(Vpn->ClientKey, Value);
+        if (strcasecmp(Key, "VerifyCert")==0) Vpn->VerifyCert=ReadFileConf(Vpn->VerifyCert, Value);
+        if (strcasecmp(Key, "ServerCert")==0) Vpn->VerifyCert=ReadFileConf(Vpn->VerifyCert, Value);
+        if (strcasecmp(Key, "ConfFile")==0) Vpn->ConfFile=ReadFileConf(Vpn->ConfFile, Value);
+        if (strcasecmp(Key, "UpFile")==0) Vpn->UpFile=ReadFileConf(Vpn->UpFile, Value);
+        if (strcasecmp(Key, "DownFile")==0) Vpn->DownFile=ReadFileConf(Vpn->DownFile, Value);
+
         if (strcasecmp(Key, "LocalAddress")==0) Vpn->LocalAddress=CopyStr(Vpn->LocalAddress, Value);
         if (strcasecmp(Key, "AllowedIPs")==0) Vpn->AllowedIPs=CommaList(Vpn->AllowedIPs, Value);
-        if (strcasecmp(Key, "ConfFile")==0) Vpn->ConfFile=CopyStr(Vpn->ConfFile, Value);
         if (strcasecmp(Key, "RemoteDev")==0) Vpn->RemoteDev=CopyStr(Vpn->RemoteDev, Value);
         if (strcasecmp(Key, "ClientID")==0) Vpn->ClientID=CopyStr(Vpn->ClientID, Value);
         if (strcasecmp(Key, "UserName")==0) Vpn->UserName=CopyStr(Vpn->UserName, Value);
         if (strcasecmp(Key, "Password")==0) Vpn->Password=CopyStr(Vpn->Password, Value);
         if (strcasecmp(Key, "DNS")==0) Vpn->DNS=CopyStr(Vpn->DNS, Value);
-        if (strcasecmp(Key, "UpFile")==0) Vpn->UpFile=CopyStr(Vpn->UpFile, Value);
-        if (strcasecmp(Key, "DownFile")==0) Vpn->DownFile=CopyStr(Vpn->DownFile, Value);
+        if (strcasecmp(Key, "Timeout")==0) Vpn->Timeout=ParseDuration(Value);
         if (strcasecmp(Key, "Protocol")==0) Vpn->Flags |= VPN_TCP;
 
         if (strcasecmp(Key, "RemoteSU")==0)
@@ -85,12 +103,34 @@ void ReadConfig(TVpn *Vpn)
 }
 
 
+
+void SaveFilePath(STREAM *S, const char *Name, const char *Path, const char *Home)
+{
+char *Tempstr=NULL;
+int hlen;
+
+        if (StrValid(Path))
+        {
+            Tempstr=MCopyStr(Tempstr, Name, "=", NULL);
+	    hlen=StrLen(Home);
+	    if (strncmp(Path, Home, hlen)==0) Tempstr=MCatStr(Tempstr, "~/", Path + hlen, "\n", NULL);
+            else Tempstr=MCatStr(Tempstr, Path, "\n", NULL);
+            STREAMWriteLine(Tempstr, S);
+        }
+
+Destroy(Tempstr);
+}
+
+
+
 void WriteConfig(TVpn *Vpn)
 {
-    char *Tempstr=NULL;
+    char *Tempstr=NULL, *Home=NULL;
     STREAM *S;
 
-    Tempstr=MCopyStr(Tempstr, GetCurrUserHomeDir(), "/.config/vpn_mgr/", Vpn->Name, "/", Vpn->Name, ".conf", NULL);
+
+    Home=MCopyStr(Home, GetCurrUserHomeDir(), "/", NULL);
+    Tempstr=MCopyStr(Tempstr, Home, "/.config/vpn_mgr/", Vpn->Name, "/", Vpn->Name, ".conf", NULL);
     MakeDirPath(Tempstr, 0700);
 
 
@@ -100,23 +140,13 @@ void WriteConfig(TVpn *Vpn)
         Tempstr=MCopyStr(Tempstr, "Server=", Vpn->Server, "\n", NULL);
         STREAMWriteLine(Tempstr, S);
 
-        if (StrValid(Vpn->ClientCert))
-        {
-            Tempstr=MCopyStr(Tempstr, "ClientCert=", Vpn->ClientCert, "\n", NULL);
-            STREAMWriteLine(Tempstr, S);
-        }
+        SaveFilePath(S, "ClientCert", Vpn->ClientCert, Home);
+        SaveFilePath(S, "ClientKey", Vpn->ClientKey, Home);
+        SaveFilePath(S, "VerifyCert", Vpn->VerifyCert, Home);
+        SaveFilePath(S, "ConfFile", Vpn->ConfFile, Home);
+        SaveFilePath(S, "UpFile", Vpn->UpFile, Home);
+        SaveFilePath(S, "DownFile", Vpn->DownFile, Home);
 
-        if (StrValid(Vpn->ClientKey))
-        {
-            Tempstr=MCopyStr(Tempstr, "ClientKey=", Vpn->ClientKey, "\n", NULL);
-            STREAMWriteLine(Tempstr, S);
-        }
-
-        if (StrValid(Vpn->VerifyCert))
-        {
-            Tempstr=MCopyStr(Tempstr, "VerifyCert=", Vpn->VerifyCert, "\n", NULL);
-            STREAMWriteLine(Tempstr, S);
-        }
 
         if (StrValid(Vpn->LocalAddress))
         {
@@ -142,32 +172,6 @@ void WriteConfig(TVpn *Vpn)
             STREAMWriteLine(Tempstr, S);
         }
 
-        if (StrValid(Vpn->UpFile))
-        {
-            Tempstr=MCopyStr(Tempstr, "UpFile=", Vpn->UpFile, "\n", NULL);
-            STREAMWriteLine(Tempstr, S);
-        }
-
-        if (StrValid(Vpn->DownFile))
-        {
-            Tempstr=MCopyStr(Tempstr, "DownFile=", Vpn->DownFile, "\n", NULL);
-            STREAMWriteLine(Tempstr, S);
-        }
-
-
-        if (StrValid(Vpn->ConfFile))
-        {
-            Tempstr=MCopyStr(Tempstr, "ConfFile=", Vpn->ConfFile, "\n", NULL);
-            STREAMWriteLine(Tempstr, S);
-        }
-
-        if (StrValid(Vpn->ConfFile))
-        {
-            Tempstr=MCopyStr(Tempstr, "ConfFile=", Vpn->ConfFile, "\n", NULL);
-            STREAMWriteLine(Tempstr, S);
-        }
-
-
         if (StrValid(Vpn->ClientID))
         {
             Tempstr=MCopyStr(Tempstr, "ClientID=", Vpn->ClientID, "\n", NULL);
@@ -183,6 +187,12 @@ void WriteConfig(TVpn *Vpn)
         if (StrValid(Vpn->Password))
         {
             Tempstr=MCopyStr(Tempstr, "Password=", Vpn->Password, "\n", NULL);
+            STREAMWriteLine(Tempstr, S);
+        }
+
+        if (Vpn->Timeout > 0)
+        {
+            Tempstr=FormatStr(Tempstr, "Timeout=%ld", Vpn->Timeout, "\n", NULL);
             STREAMWriteLine(Tempstr, S);
         }
 
@@ -219,6 +229,7 @@ void WriteConfig(TVpn *Vpn)
     }
 
     Destroy(Tempstr);
+    Destroy(Home);
 }
 
 

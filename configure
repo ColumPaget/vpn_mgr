@@ -715,7 +715,7 @@ CFLAGS
 LDFLAGS
 LIBS
 CPPFLAGS'
-ac_subdirs_all='libUseful-5'
+ac_subdirs_all='libUseful-bundled'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -3985,56 +3985,6 @@ then :
 
 fi
 
-        else
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for GetToken in -lUseful-4" >&5
-printf %s "checking for GetToken in -lUseful-4... " >&6; }
-if test ${ac_cv_lib_Useful_4_GetToken+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lUseful-4  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char GetToken ();
-int
-main (void)
-{
-return GetToken ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_Useful_4_GetToken=yes
-else $as_nop
-  ac_cv_lib_Useful_4_GetToken=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_Useful_4_GetToken" >&5
-printf "%s\n" "$ac_cv_lib_Useful_4_GetToken" >&6; }
-if test "x$ac_cv_lib_Useful_4_GetToken" = xyes
-then :
-  cf_have_libUseful4=yes
-else $as_nop
-  cf_have_libUseful4=no
-fi
-
-        ac_fn_c_check_header_compile "$LINENO" "libUseful-4/libUseful.h" "ac_cv_header_libUseful_4_libUseful_h" "$ac_includes_default"
-if test "x$ac_cv_header_libUseful_4_libUseful_h" = xyes
-then :
-  printf "%s\n" "#define HAVE_LIBUSEFUL_4_LIBUSEFUL_H 1" >>confdefs.h
-
-fi
-
         fi
 fi
 
@@ -4175,63 +4125,15 @@ then :
 
 fi
 
-elif test "$cf_have_libUseful4" = "yes"
-then
-  echo "installed libUseful-4 found, using that instead of bundled libUseful."
-  echo "if you want to use bundled libUseful, force it with --with-libuseful=no"
-  LIBUSEFUL_BUNDLED=""
+else
 
-      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for GetToken in -lUseful-4" >&5
-printf %s "checking for GetToken in -lUseful-4... " >&6; }
-if test ${ac_cv_lib_Useful_4_GetToken+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lUseful-4  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
+  LIBUSEFUL_BUNDLED="libUseful-bundled/libUseful.a"
 
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char GetToken ();
-int
-main (void)
-{
-return GetToken ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_Useful_4_GetToken=yes
-else $as_nop
-  ac_cv_lib_Useful_4_GetToken=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_Useful_4_GetToken" >&5
-printf "%s\n" "$ac_cv_lib_Useful_4_GetToken" >&6; }
-if test "x$ac_cv_lib_Useful_4_GetToken" = xyes
-then :
-  printf "%s\n" "#define HAVE_LIBUSEFUL_4 1" >>confdefs.h
-
-  LIBS="-lUseful-4 $LIBS"
-
-fi
-
-
-                else
-
-  LIBUSEFUL_BUNDLED="libUseful-5/libUseful.a"
+  printf "%s\n" "#define LIBUSEFUL_BUNDLED 1" >>confdefs.h
 
 
 
-subdirs="$subdirs libUseful-5"
+subdirs="$subdirs libUseful-bundled"
 
 fi
 

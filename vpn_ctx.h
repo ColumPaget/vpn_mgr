@@ -23,6 +23,7 @@ typedef struct
     unsigned int Flags;
     unsigned int LineSpeed;
     unsigned int MTU;
+    unsigned int Timeout;
     char *Name;
     char *Dev;
     char *RemoteDev;

@@ -1,3 +1,10 @@
+v2.2 (2026-01-16)
+-----------------
+  * call waitpid to collect child processes in ssl-server mode
+  * bundled libUseful is stored as libUseful-bundled to prevent any clashes with system-wide libUseful
+  * map filepaths in home directory to ~/ so that configs can be copied system to system
+ 
+
 v2.1 (2025-08-15)
 -----------------
   * add -auth option to TLS server, enabling extra authentication schemes
