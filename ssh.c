@@ -7,6 +7,69 @@
 
 STREAM *Active=NULL;
 
+char *SSHHostParseLS(char *RetStr, const char *Cmd, const char *LSLine)
+{
+char *Token=NULL;
+const char *ptr;
+
+if (! StrValid(LSLine)) return(RetStr);
+
+ptr=LSLine;
+
+//an ls line for a file should start with '-', not 'd' for directory or anything else
+if (*ptr == '-')
+{
+	ptr=GetToken(ptr, "\\S", &Token, 0); //perms
+	ptr=GetToken(ptr, "\\S", &Token, 0); //no of links
+	ptr=GetToken(ptr, "\\S", &Token, 0); //owner
+	ptr=GetToken(ptr, "\\S", &Token, 0); //group
+	ptr=GetToken(ptr, "\\S", &Token, 0); //size
+	ptr=GetToken(ptr, "\\S", &Token, 0); //date part 1
+	ptr=GetToken(ptr, "\\S", &Token, 0); //date part 2
+	ptr=GetToken(ptr, "\\S", &Token, 0); //date part 3
+	ptr=GetToken(ptr, "\\S", &Token, 0); //command
+
+  if (strcmp(Cmd, GetBasename(Token))==0) RetStr=CopyStr(RetStr, Token);
+}
+
+
+Destroy(Token);
+
+return(RetStr);
+}
+
+
+char *SSHHostFindCommand(char *RetStr, STREAM *S, const char *Cmd, const char *Path)
+{
+char *Token=NULL, *Tempstr=NULL;
+const char *ptr;
+
+RetStr=CopyStr(RetStr, "");
+ptr=GetToken(Path, ":", &Token, GETTOKEN_QUOTES);
+while (ptr)
+{
+Tempstr=MCopyStr(Tempstr, "ls -l -1 ", Token, "/", Cmd, "\n", NULL);
+STREAMWriteLine(Tempstr, S);
+STREAMFlush(S);
+
+Tempstr=STREAMReadLine(Tempstr, S);
+StripTrailingWhitespace(Tempstr);
+RetStr=SSHHostParseLS(RetStr, Cmd, Tempstr);
+if (StrValid(RetStr)) break;
+
+ptr=GetToken(ptr, ":", &Token, GETTOKEN_QUOTES);
+}
+
+
+if (StrValid(RetStr)) LogEvent(VPN_LOG_SYSLOG|VPN_LOG_OKAY, "SSH", "remote command '%s' found at '%s'", Cmd, RetStr);
+else LogEvent(VPN_LOG_SYSLOG|VPN_LOG_ERROR, "SSH", "remote command '%s' not found in: %s", Cmd, Path);
+
+
+Destroy(Tempstr);
+Destroy(Token);
+
+return(RetStr);
+}
 
 
 
@@ -225,6 +288,7 @@ static int SSHSetup(TVpn *Vpn, STREAM *S)
     STREAMWriteLine("stty -echo\n", S);
     SSHVpnSync(S);
     Dev=SSHGetRemoteDev(Dev, S);
+
 
     if (! StrValid(Dev))
     {

@@ -10,6 +10,7 @@ int SSHVpnUp(TVpn *Vpn);
 void SSHVpnTerminate();
 int SSHVpnValidate(TVpn *Vpn);
 STREAM *SSHVpnConnect(TVpn *Vpn, const char *Command);
+char *SSHHostFindCommand(char *RetStr, STREAM *S, const char *Cmd, const char *Path);
 int SSHVpnRunCommand(STREAM *S, const char *Cmd, int Flags);
 
 #endif

@@ -58,6 +58,7 @@ void PrintHelp()
     printf("  -local-su             force use of su locally, rather than trying both sudo and su\n");
     printf("  -remote-sudo          force use of sudo at remote end, rather than trying both sudo and su\n");
     printf("  -remote-su            force use of su at remote end, rather than trying both sudo and su\n");
+    printf("  -remote-path          remote path to use when searching for executables not in normal path (e.g. pppd), defaults to '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin\n");
     printf("  -N                    use neither su or sudo at the remote end, assume remote is setup to run with root permission\n");
     printf("  -dns <ip list>        comma-separated list of dns servers to use with this vpn\n");
     printf("  -dns peer             use dns server list supplied by ppp based vpns\n");

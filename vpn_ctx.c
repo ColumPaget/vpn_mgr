@@ -43,6 +43,7 @@ TVpn *VpnCtxCreate(const char *Action, const char *Name, const char *Server)
     if (StrValid(Name)) Vpn->DownFile=MCopyStr(Vpn->DownFile, "/etc/vpn_mgr/", Name, ".down:", NULL);
     Vpn->DownFile=MCatStr(Vpn->DownFile, "/etc/vpn_mgr/default.down", NULL);
     Vpn->LineSpeed=4000000;
+		Vpn->RemoteSearchPath=CopyStr(Vpn->RemoteSearchPath, "/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin");
 
     return(Vpn);
 }
@@ -59,14 +60,31 @@ void VpnCtxDestroy(void *p_Vpn)
     Destroy(Vpn->Server);
     Destroy(Vpn->Dev);
     Destroy(Vpn->RemoteDev);
+    Destroy(Vpn->Transport);
+    Destroy(Vpn->ServerAddress);
     Destroy(Vpn->ConfFile);
     Destroy(Vpn->UpFile);
     Destroy(Vpn->DownFile);
+    Destroy(Vpn->LocalAddress);
+    Destroy(Vpn->RemoteAddress);
     Destroy(Vpn->VerifyCert);
     Destroy(Vpn->AllowedIPs);
     Destroy(Vpn->RemoteAllowedIPs);
     Destroy(Vpn->ClientCert);
     Destroy(Vpn->ClientKey);
+    Destroy(Vpn->UserName);
+    Destroy(Vpn->Password);
+    Destroy(Vpn->VerifyCert);
+    Destroy(Vpn->PreSharedKey);
+    Destroy(Vpn->PrivSepUser);
+    Destroy(Vpn->PrivSepGroup);
+    Destroy(Vpn->Ciphers);
+    Destroy(Vpn->ClientID);
+    Destroy(Vpn->DNS);
+    Destroy(Vpn->PPPAuth);
+    Destroy(Vpn->ServerAuth);
+    Destroy(Vpn->RemoteSearchPath);
+
     free(Vpn);
 }
 

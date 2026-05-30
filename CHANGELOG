@@ -1,3 +1,8 @@
+v2.3 (2026-05-30)
+-----------------
+  * supply a default baud rate to remote pppd
+  * find remote pppd from list of likely directories
+
 v2.2 (2026-01-16)
 -----------------
   * call waitpid to collect child processes in ssl-server mode

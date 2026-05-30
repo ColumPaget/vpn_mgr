@@ -8,6 +8,7 @@
 int PPPSSHVpnUp(TVpn *Vpn)
 {
     char *Tempstr=NULL, *ID=NULL;
+    char *Cmd=NULL;
     int Flags=0;
     STREAM *S;
 
@@ -21,6 +22,9 @@ int PPPSSHVpnUp(TVpn *Vpn)
     S=SSHVpnConnect(Vpn, "");
     if (S)
     {
+				Cmd=SSHHostFindCommand(Cmd, S, "pppd", Vpn->RemoteSearchPath);
+				if (! StrValid(Cmd)) Cmd=CopyStr(Cmd, "pppd");
+				
         //assume remote is the server
         if (! StrValid(Vpn->RemoteAddress)) Vpn->RemoteAddress=CopyStr(Vpn->RemoteAddress, "172.16.0.1");
 
@@ -36,8 +40,7 @@ int PPPSSHVpnUp(TVpn *Vpn)
         if (GlobalFlags & FLAG_REMOTE_SU) Flags |= CMD_SU;
         if (GlobalFlags & FLAG_REMOTE_SUDO) Flags |= CMD_SUDO;
 
-        Tempstr=MCopyStr(Tempstr, "/sbin/pppd ipparam '", ID, "' ", Vpn->RemoteAddress, ": ", PPPD_OPTIONS, NULL);
-
+        Tempstr=FormatStr(Tempstr, "%s %d ipparam '%s' %s: %s", Cmd, Vpn->LineSpeed, ID, Vpn->RemoteAddress, PPPD_OPTIONS);
         if (Flags & (CMD_SU | CMD_SUDO)) Tempstr=CatStr(Tempstr, " noauth");
 
         SSHVpnRunCommand(S, Tempstr,  Flags);
@@ -45,6 +48,7 @@ int PPPSSHVpnUp(TVpn *Vpn)
     }
 
     Destroy(Tempstr);
+    Destroy(Cmd);
     Destroy(ID);
 }
 

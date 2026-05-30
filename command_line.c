@@ -131,6 +131,7 @@ TVpn *ParseCommandLine(int argc, char *argv[])
                 else if (strcmp(Arg, "-ppp-speed")==0) Ctx->LineSpeed=atoi(CommandLineNext(Cmd));
                 else if (strcmp(Arg, "-up")==0) Ctx->UpFile=CopyStr(Ctx->UpFile, CommandLineNext(Cmd));
                 else if (strcmp(Arg, "-down")==0) Ctx->DownFile=CopyStr(Ctx->DownFile, CommandLineNext(Cmd));
+                else if (strcmp(Arg, "-remote_path")==0) Ctx->RemoteSearchPath=CopyStr(Ctx->RemoteSearchPath, CommandLineNext(Cmd));
                 else if (strcmp(Arg, "-local-sudo")==0) GlobalFlags= (GlobalFlags & ~FLAG_SU) | FLAG_SUDO;
                 else if (strcmp(Arg, "-local-su")==0) GlobalFlags= (GlobalFlags & ~FLAG_SUDO) | FLAG_SU;
                 else if (strcmp(Arg, "-remote-sudo")==0) GlobalFlags = (GlobalFlags & ~FLAG_REMOTE_SU) | FLAG_REMOTE_SUDO;

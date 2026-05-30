@@ -40,6 +40,7 @@ void ReadConfigLine(TVpn *Vpn, const char *Line)
         if (strcasecmp(Key, "ClientID")==0) Vpn->ClientID=CopyStr(Vpn->ClientID, Value);
         if (strcasecmp(Key, "UserName")==0) Vpn->UserName=CopyStr(Vpn->UserName, Value);
         if (strcasecmp(Key, "Password")==0) Vpn->Password=CopyStr(Vpn->Password, Value);
+        if (strcasecmp(Key, "RemoteSearchPath")==0) Vpn->RemoteSearchPath=CopyStr(Vpn->RemoteSearchPath, Value);
         if (strcasecmp(Key, "DNS")==0) Vpn->DNS=CopyStr(Vpn->DNS, Value);
         if (strcasecmp(Key, "Timeout")==0) Vpn->Timeout=ParseDuration(Value);
         if (strcasecmp(Key, "Protocol")==0) Vpn->Flags |= VPN_TCP;
@@ -65,7 +66,6 @@ void ReadConfigLine(TVpn *Vpn, const char *Line)
             else if (strcmp(Value, "su")==0) GlobalFlags |= FLAG_LOCAL_SU;
             else if (strcmp(Value, "sudo")==0) GlobalFlags |= FLAG_LOCAL_SUDO;
         }
-
 
         ptr=GetNameValuePair(ptr, " ", "=", &Key, &Value);
     }
@@ -187,6 +187,12 @@ void WriteConfig(TVpn *Vpn)
         if (StrValid(Vpn->Password))
         {
             Tempstr=MCopyStr(Tempstr, "Password=", Vpn->Password, "\n", NULL);
+            STREAMWriteLine(Tempstr, S);
+        }
+
+        if (StrValid(Vpn->RemoteSearchPath))
+        {
+            Tempstr=MCopyStr(Tempstr, "RemoteSearchPath=", Vpn->RemoteSearchPath, "\n", NULL);
             STREAMWriteLine(Tempstr, S);
         }
 

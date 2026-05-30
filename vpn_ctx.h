@@ -50,6 +50,7 @@ typedef struct
     char *DNS;
     char *PPPAuth;
     char *ServerAuth;
+    char *RemoteSearchPath;
 } TVpn;
 
 TVpn *VpnCtxCreate(const char *Type, const char *Name, const char *Server);
